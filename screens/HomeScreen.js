@@ -1,35 +1,19 @@
-import React, { useState } from 'react';
-import { View, FlatList, StyleSheet, Text } from 'react-native';
+import React from 'react';
+import { View, FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import RecipeCard from '../components/RecipeCard';
+import { useRecipes } from '../context/RecipeContext';
 
-const HomeScreen = () => {
-  // Sample data - later we'll replace this with real data storage
-  const [recipes] = useState([
-    {
-      id: '1',
-      title: 'Spaghetti Carbonara',
-      cookingTime: 30,
-    },
-    {
-      id: '2',
-      title: 'Classic Burger',
-      cookingTime: 25,
-    },
-    {
-      id: '3',
-      title: 'Greek Salad',
-      cookingTime: 15,
-    },
-    {
-      id: '4',
-      title: 'Chicken Stir Fry',
-      cookingTime: 20,
-    },
-  ]);
+const HomeScreen = ({ navigation }) => {
+  const { recipes } = useRecipes();
 
   const handleRecipePress = (recipe) => {
     // We'll implement navigation to recipe details later
     console.log('Recipe pressed:', recipe.title);
+  };
+
+  const handleAddRecipe = () => {
+    navigation.navigate('AddRecipe');
   };
 
   return (
@@ -52,6 +36,9 @@ const HomeScreen = () => {
           </View>
         )}
       />
+      <TouchableOpacity style={styles.fab} onPress={handleAddRecipe}>
+        <Feather name="plus" size={24} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -79,6 +66,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     fontWeight: '500',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    backgroundColor: '#ff6b6b',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
 
