@@ -1,12 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Button, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Feather } from '@expo/vector-icons';
 
 const DiscoveryScreen = () => {
     const [meals, setMeals] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [savedMeals, setSavedMeals] = useState([]); // Local storage for now
+    const [savedMeals, setSavedMeals] = useState([]);
 
     const fetchRandomMeals = async () => {
         setLoading(true);
@@ -36,22 +37,47 @@ const DiscoveryScreen = () => {
       
     return (
         <View style={styles.container}>
-            <Button title="🔁 Refresh" onPress={fetchRandomMeals} disabled={loading} />
+            <View style={styles.header}>
+                <Text style={styles.headerTitle}>Discover New Recipes</Text>
+                <TouchableOpacity 
+                    style={styles.refreshButton} 
+                    onPress={fetchRandomMeals} 
+                    disabled={loading}
+                >
+                    <Feather name="refresh-cw" size={20} color="#ff6b6b" />
+                </TouchableOpacity>
+            </View>
             {loading ? (
-                <ActivityIndicator style={{ marginTop: 20 }} size="large" />
+                <ActivityIndicator style={styles.loader} size="large" color="#ff6b6b" />
             ) : (
                 <FlatList
                     data={meals}
                     keyExtractor={(item) => item.idMeal}
                     renderItem={({ item }) => (
                         <View style={styles.card}>
-                            <Image source={{ uri: item.strMealThumb }} style={styles.image} />
-                            <Text style={styles.title}>{item.strMeal}</Text>
-                            <TouchableOpacity style={styles.saveBtn} onPress={() => handleSaveMeal(item)}>
-                                <Text style={styles.saveText}>❤️ Save</Text>
-                            </TouchableOpacity>
+                            <Image 
+                                source={{ uri: item.strMealThumb }} 
+                                style={styles.image}
+                                resizeMode="cover"
+                            />
+                            <View style={styles.cardContent}>
+                                <View style={styles.cardHeader}>
+                                    <Text style={styles.title}>{item.strMeal}</Text>
+                                    <TouchableOpacity 
+                                        style={styles.saveBtn} 
+                                        onPress={() => handleSaveMeal(item)}
+                                    >
+                                        <Feather name="heart" size={20} color="#ff6b6b" />
+                                    </TouchableOpacity>
+                                </View>
+                                <Text style={styles.category}>
+                                    {item.strCategory} • {item.strArea}
+                                </Text>
+                            </View>
                         </View>
                     )}
+                    contentContainerStyle={styles.listContainer}
+                    showsVerticalScrollIndicator={false}
                 />
             )}
         </View>
@@ -61,33 +87,80 @@ const DiscoveryScreen = () => {
 const styles = StyleSheet.create({
     container: { 
         flex: 1, 
-        padding: 10, 
-        backgroundColor: '#fff' 
+        backgroundColor: '#f8f9fa',
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#f1f1f1',
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: '600',
+        color: '#2d3436',
+    },
+    refreshButton: {
+        padding: 8,
+        borderRadius: 8,
+        backgroundColor: '#fff5f5',
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    listContainer: {
+        padding: 16,
     },
     card: {
-        backgroundColor: '#f9f9f9',
-        marginVertical: 8,
-        borderRadius: 10,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        marginBottom: 16,
         overflow: 'hidden',
         elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
     },
     image: { 
         width: '100%', 
-        height: 200 
+        height: 200,
+        backgroundColor: '#f1f1f1',
+    },
+    cardContent: {
+        padding: 16,
+    },
+    cardHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
     },
     title: { 
-        padding: 10, 
-        fontSize: 18, 
-        fontWeight: 'bold' 
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#2d3436',
+        flex: 1,
+        marginRight: 16,
+    },
+    category: {
+        fontSize: 14,
+        color: '#666',
+        fontWeight: '500',
     },
     saveBtn: {
-        padding: 10,
-        alignItems: 'center',
-        backgroundColor: '#ffeaea',
-    },
-    saveText: { 
-        color: 'red', 
-        fontWeight: 'bold' 
+        padding: 8,
+        borderRadius: 20,
+        backgroundColor: '#fff5f5',
     },
 });
     
