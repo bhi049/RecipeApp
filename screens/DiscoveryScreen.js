@@ -9,6 +9,17 @@ const DiscoveryScreen = () => {
     const [loading, setLoading] = useState(false);
     const [savedMeals, setSavedMeals] = useState([]);
 
+    const loadSavedMeals = async () => {
+        try {
+            const saved = await AsyncStorage.getItem('savedMeals');
+            if (saved) {
+                setSavedMeals(JSON.parse(saved));
+            }
+        } catch (error) {
+            console.error('Error loading saved meals:', error);
+        }
+    };
+
     const fetchRandomMeals = async () => {
         setLoading(true);
         try {
@@ -25,13 +36,30 @@ const DiscoveryScreen = () => {
         }
     };
 
-    const handleSaveMeal = (meal) => {
-        const updatedSavedMeals = [...savedMeals, meal];
-        setSavedMeals(updatedSavedMeals);
-        AsyncStorage.setItem('savedMeals', JSON.stringify(updatedSavedMeals));
+    const handleSaveMeal = async (meal) => {
+        try {
+            const isSaved = savedMeals.some(savedMeal => savedMeal.idMeal === meal.idMeal);
+            let updatedSavedMeals;
+            
+            if (isSaved) {
+                updatedSavedMeals = savedMeals.filter(savedMeal => savedMeal.idMeal !== meal.idMeal);
+            } else {
+                updatedSavedMeals = [...savedMeals, meal];
+            }
+            
+            setSavedMeals(updatedSavedMeals);
+            await AsyncStorage.setItem('savedMeals', JSON.stringify(updatedSavedMeals));
+        } catch (error) {
+            console.error('Error saving meal:', error);
+        }
+    };
+
+    const isMealSaved = (mealId) => {
+        return savedMeals.some(meal => meal.idMeal === mealId);
     };
 
     useEffect(() => {
+        loadSavedMeals();
         fetchRandomMeals();
     }, []);
       
@@ -52,7 +80,7 @@ const DiscoveryScreen = () => {
             ) : (
                 <FlatList
                     data={meals}
-                    keyExtractor={(item) => item.idMeal}
+                    keyExtractor={(item) => `discovery_${item.idMeal}`}
                     renderItem={({ item }) => (
                         <View style={styles.card}>
                             <Image 
@@ -64,10 +92,17 @@ const DiscoveryScreen = () => {
                                 <View style={styles.cardHeader}>
                                     <Text style={styles.title}>{item.strMeal}</Text>
                                     <TouchableOpacity 
-                                        style={styles.saveBtn} 
+                                        style={[
+                                            styles.saveBtn,
+                                            isMealSaved(item.idMeal) && styles.saveBtnActive
+                                        ]} 
                                         onPress={() => handleSaveMeal(item)}
                                     >
-                                        <Feather name="heart" size={20} color="#ff6b6b" />
+                                        <Feather 
+                                            name={isMealSaved(item.idMeal) ? "heart" : "heart"} 
+                                            size={20} 
+                                            color={isMealSaved(item.idMeal) ? "#fff" : "#ff6b6b"} 
+                                        />
                                     </TouchableOpacity>
                                 </View>
                                 <Text style={styles.category}>
@@ -161,6 +196,9 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 20,
         backgroundColor: '#fff5f5',
+    },
+    saveBtnActive: {
+        backgroundColor: '#ff6b6b',
     },
 });
     
