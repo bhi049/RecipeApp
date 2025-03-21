@@ -9,6 +9,7 @@ import { SafeAreaView, StatusBar, StyleSheet } from 'react-native';
 import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import AddRecipeScreen from './screens/AddRecipeScreen';
+import DiscoveryScreen from './screens/DiscoveryScreen';
 import { RecipeProvider } from './context/RecipeContext';
 
 const Tab = createBottomTabNavigator();
@@ -49,6 +50,8 @@ export default function App() {
               tabBarIcon: ({ color, size }) => {
                 if (route.name === 'Home') {
                   return <Feather name="home" size={24} color={color} />;
+                } else if (route.name === 'Discover') {
+                  return <Feather name="compass" size={24} color={color} />;
                 }
                 return <AntDesign name="user" size={24} color={color} />;
               },
@@ -77,6 +80,13 @@ export default function App() {
             })}
           >
             <Tab.Screen name="Home" component={HomeStack} />
+            <Tab.Screen 
+              name="Discover" 
+              component={DiscoveryScreen}
+              options={{
+                title: 'Discover Recipes'
+              }}
+            />
             <Tab.Screen name="Profile" component={ProfileScreen} />
           </Tab.Navigator>
         </NavigationContainer>
