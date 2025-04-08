@@ -1,8 +1,7 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Feather from '@expo/vector-icons/Feather';
+import { Feather } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaView, StatusBar, StyleSheet, Platform } from 'react-native';
@@ -10,6 +9,7 @@ import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import AddRecipeScreen from './screens/AddRecipeScreen';
 import DiscoveryScreen from './screens/DiscoveryScreen';
+import MealDetailScreen from './screens/MealDetailScreen';
 import { RecipeProvider } from './context/RecipeContext';
 
 const Tab = createBottomTabNavigator();
@@ -46,14 +46,80 @@ const HomeStack = () => {
         options={{
           title: 'Add New Recipe',
           presentation: 'modal',
-          ...Platform.select({
-            ios: {
-              headerStyle: {
-                backgroundColor: '#fff',
-              },
-            },
-          }),
         }}
+      />
+      <Stack.Screen
+        name="MealDetail"
+        component={MealDetailScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const DiscoveryStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#fff',
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: '#f1f1f1',
+        },
+        headerTitleStyle: {
+          fontSize: 18,
+          fontWeight: '600',
+          color: '#2d3436',
+        },
+        headerBackTitleVisible: false,
+        headerTintColor: '#ff6b6b',
+      }}
+    >
+      <Stack.Screen 
+        name="DiscoveryScreen" 
+        component={DiscoveryScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MealDetail"
+        component={MealDetailScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const ProfileStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#fff',
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: '#f1f1f1',
+        },
+        headerTitleStyle: {
+          fontSize: 18,
+          fontWeight: '600',
+          color: '#2d3436',
+        },
+        headerBackTitleVisible: false,
+        headerTintColor: '#ff6b6b',
+      }}
+    >
+      <Stack.Screen 
+        name="ProfileScreen" 
+        component={ProfileScreen}
+        options={{ title: 'Profile' }}
+      />
+      <Stack.Screen
+        name="MealDetail"
+        component={MealDetailScreen}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
@@ -99,41 +165,22 @@ export default function App() {
                   },
                 }),
               },
-              headerStyle: {
-                backgroundColor: '#fff',
-                elevation: 0,
-                shadowOpacity: 0,
-                borderBottomWidth: 1,
-                borderBottomColor: '#f1f1f1',
-              },
-              headerTitleStyle: {
-                fontSize: 18,
-                fontWeight: '600',
-                color: '#2d3436',
-              },
             })}
           >
             <Tab.Screen 
               name="Home" 
               component={HomeStack}
-              options={{
-                title: 'My Recipes',
-              }}
+              options={{ headerShown: false }}
             />
             <Tab.Screen 
               name="Discover" 
-              component={DiscoveryScreen}
-              options={{
-                title: 'Discover',
-                headerShown: false,
-              }}
+              component={DiscoveryStack}
+              options={{ headerShown: false }}
             />
             <Tab.Screen 
               name="Profile" 
-              component={ProfileScreen}
-              options={{
-                title: 'Profile',
-              }}
+              component={ProfileStack}
+              options={{ headerShown: false }}
             />
           </Tab.Navigator>
         </NavigationContainer>

@@ -1,35 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather } from '@expo/vector-icons';
+import useSavedMeals from '../hooks/useSavedMeals';
 
-const ProfileScreen = () => {
-  const [savedMeals, setSavedMeals] = useState([]);
-
-  const loadSavedMeals = async () => {
-    try {
-      const saved = await AsyncStorage.getItem('savedMeals');
-      if (saved) {
-        setSavedMeals(JSON.parse(saved));
-      }
-    } catch (error) {
-      console.error('Error loading saved meals:', error);
-    }
-  };
-
-  const removeMeal = async (mealId) => {
-    try {
-      const updatedMeals = savedMeals.filter(meal => meal.idMeal !== mealId);
-      setSavedMeals(updatedMeals);
-      await AsyncStorage.setItem('savedMeals', JSON.stringify(updatedMeals));
-    } catch (error) {
-      console.error('Error removing meal:', error);
-    }
-  };
-
-  useEffect(() => {
-    loadSavedMeals();
-  }, []);
+const ProfileScreen = ({ navigation }) => {
+  const { savedMeals, removeMeal } = useSavedMeals();
 
   return (
     <View style={styles.container}>
@@ -51,7 +26,10 @@ const ProfileScreen = () => {
           data={savedMeals}
           keyExtractor={(item) => `profile_${item.idMeal}`}
           renderItem={({ item }) => (
-            <View style={styles.recipeCard}>
+            <TouchableOpacity 
+              style={styles.recipeCard}
+              onPress={() => navigation.navigate('MealDetail', { meal: item })}
+            >
               <Image 
                 source={{ uri: item.strMealThumb }} 
                 style={styles.recipeImage}
@@ -65,11 +43,14 @@ const ProfileScreen = () => {
               </View>
               <TouchableOpacity 
                 style={styles.removeButton}
-                onPress={() => removeMeal(item.idMeal)}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  removeMeal(item.idMeal);
+                }}
               >
                 <Feather name="trash-2" size={20} color="#ff6b6b" />
               </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           )}
           contentContainerStyle={styles.recipeList}
           showsVerticalScrollIndicator={false}

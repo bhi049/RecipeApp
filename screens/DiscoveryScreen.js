@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndi
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather } from '@expo/vector-icons';
 
-const DiscoveryScreen = () => {
+const DiscoveryScreen = ({ navigation }) => {
     const [meals, setMeals] = useState([]);
     const [loading, setLoading] = useState(false);
     const [savedMeals, setSavedMeals] = useState([]);
@@ -82,7 +82,10 @@ const DiscoveryScreen = () => {
                     data={meals}
                     keyExtractor={(item) => `discovery_${item.idMeal}`}
                     renderItem={({ item }) => (
-                        <View style={styles.card}>
+                        <TouchableOpacity 
+                            style={styles.card}
+                            onPress={() => navigation.navigate('MealDetail', { meal: item })}
+                        >
                             <Image 
                                 source={{ uri: item.strMealThumb }} 
                                 style={styles.image}
@@ -96,7 +99,10 @@ const DiscoveryScreen = () => {
                                             styles.saveBtn,
                                             isMealSaved(item.idMeal) && styles.saveBtnActive
                                         ]} 
-                                        onPress={() => handleSaveMeal(item)}
+                                        onPress={(e) => {
+                                            e.stopPropagation();
+                                            handleSaveMeal(item);
+                                        }}
                                     >
                                         <Feather 
                                             name={isMealSaved(item.idMeal) ? "heart" : "heart"} 
@@ -109,7 +115,7 @@ const DiscoveryScreen = () => {
                                     {item.strCategory} • {item.strArea}
                                 </Text>
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     )}
                     contentContainerStyle={styles.listContainer}
                     showsVerticalScrollIndicator={false}
