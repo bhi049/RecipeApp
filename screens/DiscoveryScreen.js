@@ -1,13 +1,13 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather } from '@expo/vector-icons';
+import { SavedMealsContext } from '../hooks/useSavedMeals';
 
 const DiscoveryScreen = ({ navigation }) => {
     const [meals, setMeals] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [savedMeals, setSavedMeals] = useState([]);
+    const {savedMeals, addMeal, removeMeal} = useContext(SavedMealsContext);
 
     const loadSavedMeals = async () => {
         try {
@@ -36,30 +36,20 @@ const DiscoveryScreen = ({ navigation }) => {
         }
     };
 
-    const handleSaveMeal = async (meal) => {
-        try {
-            const isSaved = savedMeals.some(savedMeal => savedMeal.idMeal === meal.idMeal);
-            let updatedSavedMeals;
-            
-            if (isSaved) {
-                updatedSavedMeals = savedMeals.filter(savedMeal => savedMeal.idMeal !== meal.idMeal);
-            } else {
-                updatedSavedMeals = [...savedMeals, meal];
-            }
-            
-            setSavedMeals(updatedSavedMeals);
-            await AsyncStorage.setItem('savedMeals', JSON.stringify(updatedSavedMeals));
-        } catch (error) {
-            console.error('Error saving meal:', error);
+    const handleSaveMeal = (meal) => {
+       const isSaved = savedMeals.some((savedMeal) => savedMeal.idMeal === meal.idMeal);
+        if (isSaved) {
+            removeMeal(meal.idMeal);
+        } else {
+            addMeal(meal);
         }
     };
 
     const isMealSaved = (mealId) => {
-        return savedMeals.some(meal => meal.idMeal === mealId);
+        return savedMeals.some((meal) => meal.idMeal === mealId);
     };
 
     useEffect(() => {
-        loadSavedMeals();
         fetchRandomMeals();
     }, []);
       

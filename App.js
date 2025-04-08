@@ -5,6 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaView, StatusBar, StyleSheet, Platform } from 'react-native';
+import { SavedMealsProvider } from './hooks/useSavedMeals';
 import ProfileScreen from './screens/ProfileScreen';
 import DiscoveryScreen from './screens/DiscoveryScreen';
 import MealDetailScreen from './screens/MealDetailScreen';
@@ -84,6 +85,7 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <SavedMealsProvider>
         <NavigationContainer>
           <Tab.Navigator
             screenOptions={({ route }) => ({
@@ -133,6 +135,7 @@ export default function App() {
             />
           </Tab.Navigator>
         </NavigationContainer>
+        </SavedMealsProvider>
     </SafeAreaView>
   );
 }

@@ -1,9 +1,11 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, createContext} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export const SavedMealsContext = createContext();
 
 const SAVED_MEALS_KEY = 'savedMeals';
 
-const useSavedMeals = () => {
+export const SavedMealsProvider = ({ children }) => {
     const [savedMeals, setSavedMeals] = useState([]);
 
     useEffect(() => {
@@ -29,6 +31,11 @@ const useSavedMeals = () => {
         }
     };
 
+    const addMeal = async (meal) => {
+        const updatedMeals = [...savedMeals, meal];
+        await saveMeals(updatedMeals);
+    }
+
     const removeMeal = async (mealId) => {
         try {
             const updatedMeals = savedMeals.filter(meal => meal.idMeal !== mealId);
@@ -37,7 +44,9 @@ const useSavedMeals = () => {
             console.error('Error removing meal:', error);
         }
     }; 
-    return { savedMeals, saveMeals, removeMeal };
+    return (
+        <SavedMealsContext.Provider value={{ savedMeals, addMeal, removeMeal }}>
+            {children}
+        </SavedMealsContext.Provider>
+    );
 };
-
-export default useSavedMeals;

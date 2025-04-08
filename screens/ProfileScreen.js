@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import useSavedMeals from '../hooks/useSavedMeals';
+import { SavedMealsContext } from '../hooks/useSavedMeals';
 
 const ProfileScreen = ({ navigation }) => {
-  const { savedMeals, removeMeal } = useSavedMeals();
+  const { savedMeals, removeMeal } = useContext((SavedMealsContext));
 
   return (
     <View style={styles.container}>
