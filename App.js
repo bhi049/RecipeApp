@@ -8,7 +8,6 @@ import { SafeAreaView, StatusBar, StyleSheet, Platform } from 'react-native';
 import ProfileScreen from './screens/ProfileScreen';
 import DiscoveryScreen from './screens/DiscoveryScreen';
 import MealDetailScreen from './screens/MealDetailScreen';
-import { RecipeProvider } from './context/RecipeContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -85,7 +84,6 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <RecipeProvider>
         <NavigationContainer>
           <Tab.Navigator
             screenOptions={({ route }) => ({
@@ -135,7 +133,6 @@ export default function App() {
             />
           </Tab.Navigator>
         </NavigationContainer>
-      </RecipeProvider>
     </SafeAreaView>
   );
 }
