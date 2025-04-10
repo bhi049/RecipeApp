@@ -70,7 +70,7 @@ const DiscoveryScreen = ({ navigation }) => {
             ) : (
                 <FlatList
                     data={meals}
-                    keyExtractor={(item) => `discovery_${item.idMeal}`}
+                    keyExtractor={(item, index) => `discovery_${item.idMeal}_${index}`}
                     renderItem={({ item }) => (
                         <TouchableOpacity 
                             style={styles.card}
