@@ -7,18 +7,7 @@ import { SavedMealsContext } from '../hooks/useSavedMeals';
 const DiscoveryScreen = ({ navigation }) => {
     const [meals, setMeals] = useState([]);
     const [loading, setLoading] = useState(false);
-    const {savedMeals, addMeal, removeMeal} = useContext(SavedMealsContext);
-
-    const loadSavedMeals = async () => {
-        try {
-            const saved = await AsyncStorage.getItem('savedMeals');
-            if (saved) {
-                setSavedMeals(JSON.parse(saved));
-            }
-        } catch (error) {
-            console.error('Error loading saved meals:', error);
-        }
-    };
+    const { savedMeals, addMeal, removeMeal } = useContext(SavedMealsContext);
 
     const fetchRandomMeals = async () => {
         setLoading(true);
@@ -37,7 +26,7 @@ const DiscoveryScreen = ({ navigation }) => {
     };
 
     const handleSaveMeal = (meal) => {
-       const isSaved = savedMeals.some((savedMeal) => savedMeal.idMeal === meal.idMeal);
+        const isSaved = savedMeals.some((savedMeal) => savedMeal.idMeal === meal.idMeal);
         if (isSaved) {
             removeMeal(meal.idMeal);
         } else {
@@ -52,7 +41,7 @@ const DiscoveryScreen = ({ navigation }) => {
     useEffect(() => {
         fetchRandomMeals();
     }, []);
-      
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -114,7 +103,7 @@ const DiscoveryScreen = ({ navigation }) => {
         </View>
     );
 };
-    
+
 const styles = StyleSheet.create({
     container: { 
         flex: 1, 
@@ -197,5 +186,5 @@ const styles = StyleSheet.create({
         backgroundColor: '#ff6b6b',
     },
 });
-    
+
 export default DiscoveryScreen;

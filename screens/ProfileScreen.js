@@ -2,9 +2,11 @@ import React, { useContext } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { SavedMealsContext } from '../hooks/useSavedMeals';
+import { AuthContext } from '../hooks/useAuth';
 
 const ProfileScreen = ({ navigation }) => {
   const { savedMeals, removeMeal } = useContext((SavedMealsContext));
+  const { user, logout } = useContext(AuthContext); // Fetch user details and logout function
 
   return (
     <View style={styles.container}>
@@ -14,10 +16,14 @@ const ProfileScreen = ({ navigation }) => {
             <Feather name="user" size={32} color="#ff6b6b" />
           </View>
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>My Kitchen</Text>
+            <Text style={styles.userName}>{user?.name || 'My Kitchen'}</Text>
             <Text style={styles.savedCount}>{savedMeals.length} saved recipes</Text>
           </View>
         </View>
+        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+          <Feather name="log-out" size={20} color="#ff6b6b" />
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
@@ -175,6 +181,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     textAlign: 'center',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    alignSelf: 'flex-end',
+  },
+  logoutText: {
+    fontSize: 14,
+    color: '#ff6b6b',
+    marginLeft: 8,
+    fontWeight: '600',
   },
 });
 

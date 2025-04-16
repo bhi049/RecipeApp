@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -9,6 +9,9 @@ import { SavedMealsProvider } from './hooks/useSavedMeals';
 import ProfileScreen from './screens/ProfileScreen';
 import DiscoveryScreen from './screens/DiscoveryScreen';
 import MealDetailScreen from './screens/MealDetailScreen';
+import LoginScreen from './screens/LoginScreen';
+import { auth } from './firebaseConfig';
+import { AuthProvider } from './hooks/useAuth';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -82,61 +85,81 @@ const ProfileStack = () => {
 };
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setIsAuthenticated(!!user);
+    });
+    return unsubscribe; // Poistaa kuuntelijan komponentin poistuessa
+  }, []);
+
   return (
+    <AuthProvider>
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <SavedMealsProvider>
         <NavigationContainer>
-          <Tab.Navigator
-            screenOptions={({ route }) => ({
-              tabBarIcon: ({ color, size }) => {
-                if (route.name === 'Home') {
-                  return <Feather name="home" size={24} color={color} />;
-                } else if (route.name === 'Discover') {
-                  return <Feather name="compass" size={24} color={color} />;
-                }
-                return <Feather name="user" size={24} color={color} />;
-              },
-              tabBarActiveTintColor: '#ff6b6b',
-              tabBarInactiveTintColor: '#666',
-              tabBarStyle: {
-                backgroundColor: '#fff',
-                borderTopWidth: 1,
-                borderTopColor: '#f1f1f1',
-                paddingBottom: 8,
-                paddingTop: 8,
-                height: 60,
-                ...Platform.select({
-                  ios: {
-                    shadowColor: '#000',
-                    shadowOffset: {
-                      width: 0,
-                      height: -2,
+          {isAuthenticated ? (
+            <Tab.Navigator
+              screenOptions={({ route }) => ({
+                tabBarIcon: ({ color, size }) => {
+                  if (route.name === 'Discover') {
+                    return <Feather name="compass" size={24} color={color} />;
+                  } else if (route.name === 'Profile') {
+                    return <Feather name="user" size={24} color={color} />;
+                  }
+                },
+                tabBarActiveTintColor: '#ff6b6b',
+                tabBarInactiveTintColor: '#666',
+                tabBarStyle: {
+                  backgroundColor: '#fff',
+                  borderTopWidth: 1,
+                  borderTopColor: '#f1f1f1',
+                  paddingBottom: 8,
+                  paddingTop: 8,
+                  height: 60,
+                  ...Platform.select({
+                    ios: {
+                      shadowColor: '#000',
+                      shadowOffset: {
+                        width: 0,
+                        height: -2,
+                      },
+                      shadowOpacity: 0.1,
+                      shadowRadius: 2,
                     },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 2,
-                  },
-                  android: {
-                    elevation: 8,
-                  },
-                }),
-              },
-            })}
-          >
-            <Tab.Screen 
-              name="Discover" 
-              component={DiscoveryStack}
-              options={{ headerShown: false }}
-            />
-            <Tab.Screen 
-              name="Profile" 
-              component={ProfileStack}
-              options={{ headerShown: false }}
-            />
-          </Tab.Navigator>
+                    android: {
+                      elevation: 8,
+                    },
+                  }),
+                },
+              })}
+            >
+              <Tab.Screen 
+                name="Discover" 
+                component={DiscoveryStack}
+                options={{ headerShown: false }}
+              />
+              <Tab.Screen 
+                name="Profile" 
+                component={ProfileStack}
+                options={{ headerShown: false }}
+              />
+            </Tab.Navigator>
+          ) : (
+            <Stack.Navigator>
+              <Stack.Screen 
+                name="Login" 
+                component={LoginScreen} 
+                options={{ headerShown: false }} 
+              />
+            </Stack.Navigator>
+          )}
         </NavigationContainer>
-        </SavedMealsProvider>
+      </SavedMealsProvider>
     </SafeAreaView>
+    </AuthProvider>
   );
 }
 
