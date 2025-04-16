@@ -1,49 +1,54 @@
-import {useState, useEffect, createContext} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState, useEffect, createContext } from 'react';
+import { auth, db } from '../firebaseConfig';
+import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 
 export const SavedMealsContext = createContext();
-
-const SAVED_MEALS_KEY = 'savedMeals';
 
 export const SavedMealsProvider = ({ children }) => {
     const [savedMeals, setSavedMeals] = useState([]);
 
     useEffect(() => {
-        const loadSavedMeals = async () => {
-            try {
-                const saved = await AsyncStorage.getItem(SAVED_MEALS_KEY);
-                if (saved) {
-                    setSavedMeals(JSON.parse(saved));
-                }
-            } catch (error) {
-                console.error('Error loading saved meals:', error);
-            }
-        };
-        loadSavedMeals();
-    }, []);
+        if (!auth.currentUser) return;
 
-    const saveMeals = async (meals) => {
+        const userDocRef = doc(db, 'users', auth.currentUser.uid);
+
+        // Reaaliaikainen kuuntelija Firestore-dokumentille
+        const unsubscribe = onSnapshot(userDocRef, (docSnapshot) => {
+            if (docSnapshot.exists()) {
+                setSavedMeals(docSnapshot.data().savedMeals || []);
+            } else {
+                console.log('No saved meals found for this user.');
+            }
+        });
+
+        return unsubscribe; // Poistaa kuuntelijan komponentin poistuessa
+    }, [auth.currentUser]);
+
+    const saveMealsToFirestore = async (meals) => {
+        if (!auth.currentUser) {
+            console.error('User is not authenticated.');
+            return;
+        }
+
+        const userDocRef = doc(db, 'users', auth.currentUser.uid);
         try {
-            await AsyncStorage.setItem(SAVED_MEALS_KEY, JSON.stringify(meals));
+            await setDoc(userDocRef, { savedMeals: meals }, { merge: true });
             setSavedMeals(meals);
         } catch (error) {
-            console.error('Error saving meals:', error);
+            console.error('Error saving meals to Firestore:', error);
         }
     };
 
     const addMeal = async (meal) => {
         const updatedMeals = [...savedMeals, meal];
-        await saveMeals(updatedMeals);
-    }
+        await saveMealsToFirestore(updatedMeals);
+    };
 
     const removeMeal = async (mealId) => {
-        try {
-            const updatedMeals = savedMeals.filter(meal => meal.idMeal !== mealId);
-            await saveMeals(updatedMeals);
-        } catch (error) {
-            console.error('Error removing meal:', error);
-        }
-    }; 
+        const updatedMeals = savedMeals.filter((meal) => meal.idMeal !== mealId);
+        await saveMealsToFirestore(updatedMeals);
+    };
+
     return (
         <SavedMealsContext.Provider value={{ savedMeals, addMeal, removeMeal }}>
             {children}
