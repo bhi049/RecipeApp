@@ -11,6 +11,7 @@ import DiscoveryScreen from './screens/DiscoveryScreen';
 import MealDetailScreen from './screens/MealDetailScreen';
 import LoginScreen from './screens/LoginScreen';
 import { auth } from './firebaseConfig';
+import { AuthProvider } from './hooks/useAuth';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -94,6 +95,7 @@ export default function App() {
   }, []);
 
   return (
+    <AuthProvider>
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <SavedMealsProvider>
@@ -157,6 +159,7 @@ export default function App() {
         </NavigationContainer>
       </SavedMealsProvider>
     </SafeAreaView>
+    </AuthProvider>
   );
 }
 
